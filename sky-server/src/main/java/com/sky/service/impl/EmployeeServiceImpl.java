@@ -16,7 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-
 import java.time.LocalDateTime;
 
 @Service
@@ -67,6 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
+        System.out.println("线程id3：{}" + Thread.currentThread().getId());
 
         //对象属性拷贝 源对象->目标对象
         BeanUtils.copyProperties(employeeDTO, employee);
@@ -82,9 +82,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateTime(LocalDateTime.now());
 
         //设置当前记录的创建人id和修改人id(当前登录用户的id)
-        // TODO 获取当前登录用户的id
-        employee.setCreateUser(10L);
-        employee.setUpdateUser(10L);
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
     }
