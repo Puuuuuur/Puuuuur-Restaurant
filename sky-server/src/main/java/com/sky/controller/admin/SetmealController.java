@@ -87,4 +87,18 @@ public class SetmealController {
         setmealService.update(setmealDTO);
         return Result.success();
     }
+
+    /**
+     * 启售禁售套餐套餐
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用套餐")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("{}套餐：{}", (status == 1 ? "启" : "禁"), id);
+        setmealService.startOrStop(status, id);
+        return Result.success();
+    }
 }
