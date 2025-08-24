@@ -47,7 +47,7 @@ sky:
     # 设置用户jwt过期时间
     user-ttl: 97200000
     # 设置user前端传递过来的令牌名称
-    user-token-name: authorization
+    user-token-name: authentication
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
