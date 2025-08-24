@@ -11,11 +11,4 @@ sky:
     port: 6379
     password: 123456
     database: 0
-  wechat:
-    appid: wxa1de6c982c0abd32
-    secret: c55353abd98494be30fd34d15f45e3a9
-  alioss:
-    access-key-id: LTAI5tHeuZhPiJbwZx1EgoCz
-    access-key-secret: O2FAadvXrXZUW11hGvumoXpkGImpAe
-    endpoint: oss-cn-beijing.aliyuncs.com
-    bucket-name: cangqiong-pu
+
