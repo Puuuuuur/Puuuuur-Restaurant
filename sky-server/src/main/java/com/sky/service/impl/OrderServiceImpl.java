@@ -324,6 +324,47 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 确认订单
+     * @param id
+     */
+    public void delivery(Long id) {
+        //根据id查询订单
+        Orders orders = orderMapper.getById(id);
+
+        //查看订单是否存在，且状态为3(已接单)
+        if (orders == null || !orders.getStatus().equals(Orders.CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders_after = new Orders();
+        orders_after.setId(id);
+        orders_after.setStatus(Orders.DELIVERY_IN_PROGRESS);
+
+        orderMapper.update(orders_after);
+    }
+
+    /**
+     * 确认订单
+     * @param id
+     */
+    public void complete(Long id) {
+        //根据id查询订单
+        Orders orders = orderMapper.getById(id);
+
+        //查看订单是否存在，且状态为4(派送中)
+        if (orders == null || !orders.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders_after = new Orders();
+        orders_after.setId(id);
+        orders_after.setStatus(Orders.COMPLETED);
+        orders_after.setDeliveryTime(LocalDateTime.now());
+
+        orderMapper.update(orders_after);
+    }
+
+    /**
      * 根据订单id查询订单菜品数据
      *
      * @param orders
