@@ -5,11 +5,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
@@ -255,6 +254,48 @@ public class OrderServiceImpl implements OrderService {
         orderVO.setOrderDetailList(orderDetailList);
 
         return orderVO;
+    }
+
+    /**
+     * 商家接单
+     * @param ordersConfirmDTO
+     */
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders orders = new Orders();
+        orders.setId(ordersConfirmDTO.getId());
+        orders.setStatus(Orders.CONFIRMED);
+
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 拒单
+     * @param ordersRejectionDTO
+     */
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) {
+        //根据id查询订单
+        Orders orders = orderMapper.getById(ordersRejectionDTO.getId());
+
+        //订单只有存在且状态为2（待接单）才可拒单，否则异常
+        if (orders == null || !orders.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        //支付状态
+        Integer payStatus = orders.getPayStatus();
+        if (payStatus.equals(Orders.PAID)) {
+            //如果订单已经支付，需要退款
+            log.info("订单已支付，申请退款");
+        }
+
+        //根据订单id更新订单状态、拒单原因、取消时间
+        Orders orders_after = new Orders();
+        orders_after.setId(orders.getId());
+        orders_after.setStatus(Orders.CANCELLED);
+        orders_after.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders_after.setCancelTime(LocalDateTime.now());
+
+        orderMapper.update(orders_after);
     }
 
     /**
