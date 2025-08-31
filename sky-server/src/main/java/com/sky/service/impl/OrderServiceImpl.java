@@ -299,6 +299,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 取消订单
+     * @param ordersCancelDTO
+     */
+    public void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception {
+        //根据id查询订单
+        Orders orders = orderMapper.getById(ordersCancelDTO.getId());
+
+        //支付状态
+        Integer payStatus = orders.getPayStatus();
+        if (payStatus.equals(Orders.PAID)) {
+            //如果订单已经支付，需要退款
+            log.info("订单已支付，申请退款");
+        }
+
+        //根据订单id更新订单状态、取消原因、取消时间
+        Orders orders_after = new Orders();
+        orders_after.setId(orders.getId());
+        orders_after.setStatus(Orders.CANCELLED);
+        orders_after.setCancelReason(ordersCancelDTO.getCancelReason());
+        orders_after.setCancelTime(LocalDateTime.now());
+
+        orderMapper.update(orders_after);
+    }
+
+    /**
      * 根据订单id查询订单菜品数据
      *
      * @param orders
