@@ -365,6 +365,42 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 用户端订单分页查询
+     * @param pageNum
+     * @param pageSize
+     * @param status
+     * @return
+     */
+    public PageResult pageQuery4User(int pageNum, int pageSize, Integer status) {
+        PageHelper.startPage(pageNum, pageSize);
+
+        OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        ordersPageQueryDTO.setStatus(status);
+
+        Page<Orders> page = orderMapper.pageQuery4User(ordersPageQueryDTO);
+
+        //返回值应该是List<OrderVO>格式的
+        List<OrderVO> list = new ArrayList<>();
+        if(page != null && page.getTotal() > 0){
+            for (Orders orders : page) {
+                Long orderId = orders.getId();//订单ID
+
+                //查询订单明细
+                List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orderId);
+
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders,orderVO);
+                orderVO.setOrderDetailList(orderDetailList);
+
+                list.add(orderVO);
+            }
+        }
+
+        return new PageResult(page.getTotal(), list);
+    }
+
+    /**
      * 根据订单id查询订单菜品数据
      *
      * @param orders
